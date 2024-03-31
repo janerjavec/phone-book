@@ -90,9 +90,49 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("addButton").addEventListener("click", addParticipant);
 });
 
-/*
-// The jQuery way of doing it
-$(document).ready(() => {
-    // Alternatively, you can use jQuery to achieve the same result
-});
-*/
+
+let sortByFirstNameAsc = true;
+
+function sortTableByFirstName() {
+    const table = document.getElementById("participant-table");
+    const rows = Array.from(table.querySelectorAll("tr")).slice(1); // Exclude the header row
+
+    rows.sort((a, b) => {
+        const nameA = a.cells[1].textContent.toUpperCase();
+        const nameB = b.cells[1].textContent.toUpperCase();
+        if (sortByFirstNameAsc) {
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+            return 0;
+        } else {
+            if (nameA > nameB) {
+                return -1;
+            }
+            if (nameA < nameB) {
+                return 1;
+            }
+            return 0;
+        }
+    });
+
+    // Remove existing rows
+    while (table.rows.length > 1) {
+        table.deleteRow(1);
+    }
+
+    // Append sorted rows
+    rows.forEach(row => {
+        table.appendChild(row);
+    });
+
+    // Toggle sorting order for the next click
+    sortByFirstNameAsc = !sortByFirstNameAsc;
+
+    // Update sort indicator arrow
+    const sortIndicator = document.getElementById("sortIndicator");
+    sortIndicator.textContent = sortByFirstNameAsc ? "↓" : "↑";
+}
