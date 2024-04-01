@@ -72,7 +72,7 @@
         margin: 5% auto;
         padding: 20px;
         border-radius: 5px;
-        width: 20%;
+        width: 40%;
     }
     .close {
         color: #aaa;
@@ -164,6 +164,30 @@
     </div>
 </div>
 
+<!-- Modal for Editing Contact -->
+<div id="edit-contact-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <h2>Edit Contact</h2>
+        <div class="input-container">
+            <label for="editNameInput">Name:</label>
+            <input type="text" id="editNameInput" placeholder="Janez Novak">
+        </div>
+        <div class="input-container">
+            <label for="editPhoneInput">Phone:</label>
+            <input type="text" id="editPhoneInput" oninput="formatPhoneNumber(this)" placeholder="012 345 678">
+            <span id="editPhoneError" class="error-message"></span>
+        </div>
+        <div class="input-container">
+            <label for="editEmailInput">Email:</label>
+            <input type="text" id="editEmailInput" placeholder="janez.novak@gmail.com">
+        </div>
+        <div class="btn-container">
+            <button onclick="updateContact()">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let addresses = [];
     let originalAddresses = [];
@@ -191,89 +215,108 @@
     }
 
     function displayAddresses() {
-        // Clear previous content
-        document.getElementById('contact-container').innerHTML = '';
+    // Clear previous content
+    document.getElementById('contact-container').innerHTML = '';
 
-        // Sort addresses alphabetically
-        addresses.sort((a, b) => a.name.localeCompare(b.name));
+    // Sort addresses alphabetically
+    addresses.sort((a, b) => a.name.localeCompare(b.name));
 
-        let currentLetter = null;
-        let letterBlock = null;
+    let currentLetter = null;
+    let letterBlock = null;
 
-        addresses.forEach((address, index) => {
-            const firstLetter = address.name.charAt(0).toUpperCase();
+    addresses.forEach((address, index) => {
+        const firstLetter = address.name.charAt(0).toUpperCase();
 
-            if (firstLetter !== currentLetter) {
-                // Create a new letter block
-                currentLetter = firstLetter;
-                letterBlock = document.createElement('div');
-                letterBlock.className = 'letter-block';
-                letterBlock.innerHTML = `<div class="letter">${currentLetter}</div>`;
-                document.getElementById('contact-container').appendChild(letterBlock);
-            }
+        if (firstLetter !== currentLetter) {
+            // Create a new letter block
+            currentLetter = firstLetter;
+            letterBlock = document.createElement('div');
+            letterBlock.className = 'letter-block';
+            letterBlock.innerHTML = `<div class="letter">${currentLetter}</div>`;
+            document.getElementById('contact-container').appendChild(letterBlock);
+        }
 
-            const contactItem = document.createElement('div');
-            contactItem.className = 'contact-item';
-            contactItem.textContent = address.name;
-            letterBlock.appendChild(contactItem);
+        const contactItem = document.createElement('div');
+        contactItem.className = 'contact-item';
+        contactItem.textContent = address.name;
+        letterBlock.appendChild(contactItem);
 
-            const detailsContainer = document.createElement('div');
-            detailsContainer.className = 'contact-details';
-            detailsContainer.id = `details-${index}`;
-            detailsContainer.innerHTML = `
-                <p><strong>Phone:</strong> ${address.phone}</p>
-                <p><strong>Email:</strong> ${address.email}</p>
-                <div class="edit-remove-contact">
-                    <button onclick="editContact(${addresses.indexOf(address)})">Edit Contact</button>
-                    <button onclick="removeContact(${addresses.indexOf(address)})">Remove Contact</button>
-                </div>
-            `;
-            contactItem.appendChild(detailsContainer);
+        const detailsContainer = document.createElement('div');
+        detailsContainer.className = 'contact-details';
+        detailsContainer.id = `details-${index}`;
 
-            contactItem.onclick = function() {
-                toggleDetails(detailsContainer);
+        // Check if email is provided
+        let emailContent = '';
+        if (address.email.trim() !== '') {
+            emailContent = `<p><strong>Email:</strong> ${address.email}</p>`;
+        }
 
-            };
-        });
-    }
-    /*
-    function editContact(index) {
-        //document.querySelector('#create-contact-modal h2').textContent = "Edit Contact";
-        const address = addresses[index];
-        document.getElementById('nameInput').value = address.name;
-        document.getElementById('phoneInput').value = address.phone;
-        document.getElementById('emailInput').value = address.email;
-        openModal(); // Open the modal to allow editing
-        document.querySelector('#create-contact-modal h2').textContent = "Edit Contact";
+        detailsContainer.innerHTML = `
+            <p><strong>Phone:</strong> ${address.phone}</p>
+            ${emailContent}
+            <div class="edit-remove-contact">
+                <button onclick="editContact(${addresses.indexOf(address)})">Edit Contact</button>
+                <button onclick="removeContact(${addresses.indexOf(address)})">Remove Contact</button>
+            </div>
+        `;
+        contactItem.appendChild(detailsContainer);
 
-        // Add an event listener to the "Add" button in the modal
-        const addButton = document.querySelector('#create-contact-modal button');
-        addButton.textContent = 'Save'; // Change the button text to "Save"
-        addButton.onclick = function() {
-            // Get the edited values from the modal inputs
-            const editedName = document.getElementById('nameInput').value;
-            const editedPhone = document.getElementById('phoneInput').value;
-            const editedEmail = document.getElementById('emailInput').value;
-
-            // Update the existing contact with the edited information
-            addresses[index] = {
-                name: editedName,
-                phone: editedPhone,
-                email: editedEmail
-            };
-
-            // Save the updated addresses to local storage and display them
-            saveAddressesToLocalStorage();
-            displayAddresses();
-
-            // Close the modal
-            closeModal();
+        contactItem.onclick = function() {
+            toggleDetails(detailsContainer);
         };
+    });
+}
+
+
+    let selectedContactIndex; // Add this line at the top of your JavaScript code
+
+// Modify the editContact function to store the index of the selected contact
+function editContact(index) {
+    selectedContactIndex = index;
+    const contact = addresses[index];
+    document.getElementById('editNameInput').value = contact.name;
+    document.getElementById('editPhoneInput').value = contact.phone;
+    document.getElementById('editEmailInput').value = contact.email;
+    document.getElementById('edit-contact-modal').style.display = 'block';
+}
+
+    // Function to close the edit modal
+    function closeEditModal() {
+        document.getElementById('edit-contact-modal').style.display = 'none';
+        clearEditInputFields();
     }
-    */
+
+    // Function to clear input fields in the edit modal
+    function clearEditInputFields() {
+        document.getElementById('editNameInput').value = '';
+        document.getElementById('editPhoneInput').value = '';
+        document.getElementById('editEmailInput').value = '';
+    }
+
+    // Function to update contact details
+    function updateContact() {
+        const name = document.getElementById('editNameInput').value;
+        const phone = document.getElementById('editPhoneInput').value;
+        const email = document.getElementById('editEmailInput').value;
+
+        if (name && phone && email) {
+            if (phone.startsWith('0')) {
+                document.getElementById('editPhoneError').style.display = 'none';
+                const updatedAddress = { name, phone, email };
+                addresses[selectedContactIndex] = updatedAddress;
+                saveAddressesToLocalStorage();
+                displayAddresses();
+                closeEditModal();
+            } else {
+                document.getElementById('editPhoneError').style.display = 'block';
+            }
+        } else {
+            alert('Please fill in all fields.');
+        }
+    }
+
     function openModal() {
         document.getElementById('create-contact-modal').style.display = 'block';
-        document.querySelector('#create-contact-modal h2').textContent = "Add Contact";
     }
 
     function closeModal() {
@@ -292,7 +335,11 @@
         const phone = document.getElementById('phoneInput').value;
         const email = document.getElementById('emailInput').value;
 
-        if (name && phone && email) {
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isEmailValid = email.trim() === '' || emailRegex.test(email);
+
+        if (name && phone && isEmailValid) { // Check if name, phone, and email format are valid
             if (phone.startsWith('0')) {
                 document.getElementById('phoneError').style.display = 'none';
                 const newAddress = { name, phone, email };
@@ -304,10 +351,16 @@
                 document.getElementById('phoneError').style.display = 'block';
             }
         } else {
-            alert('Please fill in all fields.');
+            if (!isEmailValid) {
+                alert('Please enter a valid email address.');
+            } else {
+                alert('Please fill in the name and phone number.');
+            }
         }
         updateSearchPlaceholder();
     }
+
+
 
     function saveAddressesToLocalStorage() {
         localStorage.setItem('addresses', JSON.stringify(addresses));
@@ -338,76 +391,91 @@
 
 
     function searchContacts() {
-        const searchValue = document.getElementById('search-bar').value.toLowerCase();
-        const cancelBtn = document.getElementById('cancel-search-btn');
+    const searchValue = document.getElementById('search-bar').value.toLowerCase();
+    const cancelBtn = document.getElementById('cancel-search-btn');
 
-        // Show or hide cancel button based on search input
-        if (searchValue.trim() !== '') {
-            cancelBtn.style.display = 'block';
-            document.getElementById('search-bar').style.width = "240px"; // Change width to 200px
-
-        } else {
-            cancelBtn.style.display = 'none';
-            document.getElementById('search-bar').style.width = "100%";
-            cancelSearch();
-            return;
-        }
-        const matchingAddresses = addresses.filter(address => 
-            address.name.toLowerCase().includes(searchValue) ||
-            address.phone.toLowerCase().includes(searchValue) ||
-            address.email.toLowerCase().includes(searchValue)
-        );
-
-        // Clear previous content
-        document.getElementById('contact-container').innerHTML = '';
-
-        if (matchingAddresses.length > 0) {
-            matchingAddresses.forEach(address => {
-                const contactItem = document.createElement('div');
-                contactItem.className = 'contact-item';
-                contactItem.textContent = address.name;
-                document.getElementById('contact-container').appendChild(contactItem);
-
-                const detailsContainer = document.createElement('div');
-                detailsContainer.className = 'contact-details';
-                detailsContainer.id = `details-${addresses.indexOf(address)}`;
-                detailsContainer.innerHTML = `
-                    <p><strong>Phone:</strong> ${address.phone}</p>
-                    <p><strong>Email:</strong> ${address.email}</p>
-                    <div class="remove-contact">
-                        <button onclick="removeContact(${addresses.indexOf(address)})">Remove Contact</button>
-                    </div>
-                `;
-                contactItem.appendChild(detailsContainer);
-                let phoneHighlight;
-
-                // Highlight matching parts in the phone number
-                if (searchValue && address.phone.toLowerCase().includes(searchValue)) {
-                    const phoneParts = address.phone.split(searchValue);
-                    const formattedPhone = phoneParts.join(`<strong>${searchValue}</strong>`);
-                    phoneHighlight = document.createElement('div');
-                    phoneHighlight.innerHTML = formattedPhone;
-                    phoneHighlight.style.fontWeight = 'normal';
-                    phoneHighlight.style.fontSize = '14px';
-                    contactItem.appendChild(phoneHighlight);
-                }
-
-                contactItem.onclick = function() {
-                    if (detailsContainer.style.display === 'block') {
-                        // If details are visible, hide them and show phoneHighlight
-                        toggleDetails(detailsContainer);
-                        phoneHighlight.style.display = 'block';
-                    } else {
-                        // If details are hidden, show them and hide phoneHighlight
-                        toggleDetails(detailsContainer);
-                        phoneHighlight.style.display = 'none';
-                    }
-                };
-            });
-        } else {
-            document.getElementById('contact-container').innerHTML = '<p>No matching contacts found.</p>';
-        }
+    // Show or hide cancel button based on search input
+    if (searchValue.trim() !== '') {
+        cancelBtn.style.display = 'block';
+        document.getElementById('search-bar').style.width = "240px"; // Change width to 200px
+    } else {
+        cancelBtn.style.display = 'none';
+        document.getElementById('search-bar').style.width = "100%";
+        cancelSearch();
+        return;
     }
+
+    const matchingAddresses = addresses.filter(address => 
+        address.name.toLowerCase().includes(searchValue) ||
+        address.phone.toLowerCase().includes(searchValue) ||
+        address.email.toLowerCase().includes(searchValue)
+    );
+
+    // Clear previous content
+    document.getElementById('contact-container').innerHTML = '';
+
+    if (matchingAddresses.length > 0) {
+        matchingAddresses.forEach(address => {
+            const contactItem = document.createElement('div');
+            contactItem.className = 'contact-item';
+            contactItem.textContent = address.name;
+            document.getElementById('contact-container').appendChild(contactItem);
+
+            const detailsContainer = document.createElement('div');
+            detailsContainer.className = 'contact-details';
+            detailsContainer.id = `details-${addresses.indexOf(address)}`;
+            detailsContainer.innerHTML = `
+                <p><strong>Phone:</strong> ${address.phone}</p>
+                <p><strong>Email:</strong> ${address.email}</p>
+                <div class="remove-contact">
+                    <button onclick="removeContact(${addresses.indexOf(address)})">Remove Contact</button>
+                </div>
+            `;
+            contactItem.appendChild(detailsContainer);
+            let phoneHighlight;
+            let emailHighlight;
+
+            // Highlight matching parts in the phone number
+            if (searchValue && address.phone.toLowerCase().includes(searchValue)) {
+                const phoneParts = address.phone.split(searchValue);
+                const formattedPhone = phoneParts.join(`<strong>${searchValue}</strong>`);
+                phoneHighlight = document.createElement('div');
+                phoneHighlight.innerHTML = formattedPhone;
+                phoneHighlight.style.fontWeight = 'normal';
+                phoneHighlight.style.fontSize = '14px';
+                contactItem.appendChild(phoneHighlight);
+            }
+
+            // Highlight matching parts in the email address
+            if (searchValue && address.email.toLowerCase().includes(searchValue)) {
+                const emailParts = address.email.split(searchValue);
+                const formattedEmail = emailParts.join(`<strong>${searchValue}</strong>`);
+                emailHighlight = document.createElement('div');
+                emailHighlight.innerHTML = formattedEmail;
+                emailHighlight.style.fontWeight = 'normal';
+                emailHighlight.style.fontSize = '14px';
+                contactItem.appendChild(emailHighlight);
+            }
+
+            contactItem.onclick = function() {
+                if (detailsContainer.style.display === 'block') {
+                    // If details are visible, hide them and show phone/email highlights
+                    toggleDetails(detailsContainer);
+                    if (phoneHighlight) phoneHighlight.style.display = 'block';
+                    if (emailHighlight) emailHighlight.style.display = 'block';
+                } else {
+                    // If details are hidden, show them and hide phone/email highlights
+                    toggleDetails(detailsContainer);
+                    if (phoneHighlight) phoneHighlight.style.display = 'none';
+                    if (emailHighlight) emailHighlight.style.display = 'none';
+                }
+            };
+        });
+    } else {
+        document.getElementById('contact-container').innerHTML = '<p>No matching contacts found.</p>';
+    }
+}
+
 
     function toggleDetails(detailsContainer) {
         if (detailsContainer.style.display === 'block') {
