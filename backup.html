@@ -107,6 +107,24 @@
 
 #search-bar {
     width: 100%;
+    height: 30px;
+    background-color: #EEEEF0;
+    border: none;
+    border-radius: 7px;
+    padding-left: 30px; /* Adjust as needed based on icon width */
+    transition: width 0.1s ease;
+}
+
+.search-icon {
+    position: absolute;
+    left: 7px;
+    top: 7px;
+    width: 15px; /* Adjust width as needed */
+    height: 15px; /* Adjust height as needed */
+    background-image: url('https://icons.veryicon.com/png/o/miscellaneous/ios-apple-icon/ios-search-10.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 1;
 }
 
 #cancel-search-btn {
@@ -119,11 +137,37 @@
     padding: 0 10px;
     cursor: pointer;
     display: none; /* Initially hide the button */
+    
 }
 #create-contact-btn {
     position: absolute;
     top: 0px;
     right: 0px;
+    background: none;
+    border: none;
+    font-size:25px;
+    cursor: pointer;
+}
+
+/* mobiles */
+@media only screen and (max-width: 600px) {
+    /* Dodajte pravila, ki se nanašajo na mobilne naprave */
+}
+
+/* tablets */
+@media only screen and (min-width: 601px) and (max-width: 992px) {
+    /* Dodajte pravila, ki se nanašajo na tablične naprave */
+}
+
+/* Desktops */
+@media only screen and (min-width: 993px) {
+    /* Dodajte pravila, ki se nanašajo na namizne računalnike */
+    #address-book {
+        width: 600px; /* Spremeni širino na namiznih računalnikih */
+        margin: 0 auto; /* Centraliziraj na namiznih računalnikih */
+    }
+
+    /* Dodajte ali spremenite druga pravila po potrebi */
 }
 
 </style>
@@ -132,9 +176,11 @@
 <div id="address-book">
     <h2>Address Book</h2>
     <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
         <input type="text" id="search-bar" oninput="searchContacts()" placeholder="Search...">
         <button id="cancel-search-btn" onclick="cancelSearch()">Cancel</button>
     </div>
+    
     <button id="create-contact-btn" onclick="openModal()">+</button>
     <div id="contact-container"></div>
 </div>
