@@ -5,23 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Address Book</title>
 <style>
-    /* Styles for the address book */
     #address-book {
         font-family: Arial, sans-serif;
         width: 300px;
         margin: 0 auto;
         position: relative;
     }
-    #address-book h2 {
-        text-align: center;
-    }
-    .letter-block {
-        margin-top: 10px;
-    }
     .letter {
-        font-size: 20px;
+        font-size: 15px;
         font-weight: bold;
         margin-top: 10px;
+        margin-bottom: 12px; /* Adjust as needed */
+        color: #8A898E;
+        position: relative; /* Ensure relative positioning */
+    }
+    .letter::after {
+        content: '';
+        position: absolute;
+        bottom: -2px; /* Adjust as needed */
+        left: 0;
+        width: 100%;
+        height: 0.1px; /* Thickness of the line */
+        background-color: #D1D1D3; /* Color of the line */
     }
     .contact-list {
         list-style-type: none;
@@ -30,31 +35,21 @@
     .contact-item {
         cursor: pointer;
         padding: 5px;
-
         background-color: #f2f2f2;
         border-radius: 7px;
         margin-bottom:5px;
-
     }
-
-    .contact-item:hover {
-        background-color: #e6e6e6;
+    .contact-details {
+        display: block;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
     }
-
-.contact-details {
-
-    display: block;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-}
-
-.contact-item.open .contact-details {
-    max-height: 200px; /* Adjust max-height as needed */
-    opacity: 1;
-}
-
+    .contact-item.open .contact-details {
+        max-height: 200px;
+        opacity: 1;
+    }
     .remove-contact {
         text-align: center;
         margin-top: 5px;
@@ -65,10 +60,8 @@
         box-sizing: border-box;
         margin-bottom: 10px;
     }
-
-
-    /* Styles for the modal */
-    .modal {
+    .form {
+        font-family: Arial, sans-serif;
         display: none;
         position: fixed;
         z-index: 1;
@@ -80,7 +73,7 @@
         background-color: rgba(0,0,0,0.4);
         padding-top: 60px;
     }
-    .modal-content {
+    .form-content {
         background-color: #fefefe;
         margin: 5% auto;
         padding: 20px;
@@ -115,93 +108,196 @@
         text-align: center;
     }
     .search-container {
-    position: relative;
-}
-
-#search-bar {
-    width: 100%;
-    height: 30px;
-    background-color: #EEEEF0;
-    border: none;
-    border-radius: 7px;
-    padding-left: 30px; /* Adjust as needed based on icon width */
-    transition: width 0.1s ease;
-}
-
-.search-icon {
-    position: absolute;
-    left: 7px;
-    top: 7px;
-    width: 15px; /* Adjust width as needed */
-    height: 15px; /* Adjust height as needed */
-    background-image: url('https://icons.veryicon.com/png/o/miscellaneous/ios-apple-icon/ios-search-10.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    z-index: 1;
-}
-
-#cancel-search-btn {
-    background-color: transparent;
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 30px;
-    border: none;
-    padding: 0 10px;
-    cursor: pointer;
-    display: none; /* Initially hide the button */
-    
-}
-#create-contact-btn {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    background: none;
-    border: none;
-    font-size:25px;
-    cursor: pointer;
-}
-
-/* mobiles */
-@media only screen and (max-width: 600px) {
-    /* Dodajte pravila, ki se nanašajo na mobilne naprave */
-}
-
-/* tablets */
-@media only screen and (min-width: 601px) and (max-width: 992px) {
-    /* Dodajte pravila, ki se nanašajo na tablične naprave */
-}
-
-/* Desktops */
-@media only screen and (min-width: 993px) {
-    /* Dodajte pravila, ki se nanašajo na namizne računalnike */
-    #address-book {
-        width: 600px; /* Spremeni širino na namiznih računalnikih */
-        margin: 0 auto; /* Centraliziraj na namiznih računalnikih */
+        position: relative;
+    }
+    #search-bar {
+        width: 100%;
+        height: 30px;
+        background-color: #EEEEF0;
+        border: none;
+        border-radius: 7px;
+        padding-left: 30px;
+        transition: width 0.1s ease;
+    }
+    .search-icon {
+        position: absolute;
+        left: 7px;
+        top: 7px;
+        width: 15px;
+        height: 15px;
+        background-image: url('https://icons.veryicon.com/png/o/miscellaneous/ios-apple-icon/ios-search-10.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        z-index: 1;
+    }
+    #cancel-search-btn {
+        background-color: transparent;
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 30px;
+        border: none;
+        padding: 0 10px;
+        cursor: pointer;
+        display: none; /* initially hide button */
+    }
+    .edit-remove-contact button {
+        padding:5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        background-color:white;
     }
 
-    /* Dodajte ali spremenite druga pravila po potrebi */
-}
+    /* Mobile view */
+    @media only screen and (max-width: 992px) {
+        #right-container {
+            display: none;
+        }
+        .selected-contact {
+            background-color: #f2f2f2;
+        }
+        #create-contact-btn {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background: none;
+            border: none;
+            font-size:25px;
+            cursor: pointer;
+        }
+        .contact-item:hover {
+            background-color: #e6e6e6;
+        }
+    }
+
+    /* Desktop view */
+    @media only screen and (min-width: 993px) {
+        #cancel-search-btn {
+            padding-right:90px;
+        }
+        .letter {
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 12px; /* Adjust as needed */
+            color: #8A898E;
+            position: relative;
+        }
+        .letter::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 0.1px;
+            background-color: #D1D1D3;
+        }
+        #address-book {
+            display: flex;
+            width: 100%;
+        }
+        .header-container {
+            width: calc(100% - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #search-bar {
+            width: calc(100% - 80px);
+            height: 30px;
+            background-color: white;
+            border: none;
+            border-radius: 7px;
+            padding-left: 30px; /* Adjust as needed based on icon width */
+            transition: width 0.1s ease;
+        }
+        #left-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            padding-left: 20px;
+            padding-right: calc(50% - 200px); /* Adjust as needed */
+            background-color: #E2E2E2;
+            overflow-y: auto;
+        }
+        #right-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+            background-color: #ffffff;
+            overflow-y: auto;
+            border-left: 2px solid #D9D9D9;
+        }
+        #create-contact-btn {
+            padding:7px;
+            padding-inline:10px;
+            background-color: white;
+            border: none;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        .contact-item {
+            width: calc(100% - 72px);
+            cursor: pointer;
+            padding: 5px;
+            background-color: white;
+            border-radius: 7px;
+            margin-bottom:5px;
+        }
+        .selected-contact {
+            background-color: #5AA1FD;
+            color:white;
+            font-weight:bold;
+        }
+        .selected-contact:hover {
+            background-color: #5AA1FD;
+            color:white;
+            font-weight:bold;
+        }
+        #contact-container {
+            height: calc(100% - 100px); /* Adjust height as needed */
+            overflow-y: auto; /* Set overflow-y to scroll */
+            padding-bottom: 50px; /* Adjust as needed */
+        }
+    }
 
 </style>
 </head>
 <body>
-<div id="address-book">
-    <h2>Address Book</h2>
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search-bar" oninput="searchContacts()" placeholder="Search...">
-        <button id="cancel-search-btn" onclick="cancelSearch()">Cancel</button>
+    <div id="address-book">
+        <div id="left-container">
+            <div class="header-container">
+                <h2>Address Book</h2>
+                <button id="create-contact-btn" onclick="openForm()">+</button>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-bar" oninput="searchContacts()" placeholder="Search...">
+                <button id="cancel-search-btn" onclick="cancelSearch()">Cancel</button>
+            </div>
+            <div id="contact-container"></div>
+        </div>
+        <div id="right-container">
+        </div>
     </div>
-    
-    <button id="create-contact-btn" onclick="openModal()">+</button>
-    <div id="contact-container"></div>
 </div>
 
-<!-- Modal -->
-<div id="create-contact-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+<!-- Form -->
+<div id="create-contact-form" class="form">
+    <div class="form-content">
+        <span class="close" onclick="closeForm()">&times;</span>
         <h2>Add Contact</h2>
         <div class="input-container">
             <label for="nameInput">Name:</label>
@@ -217,16 +313,16 @@
             <label for="emailInput">Email:</label>
             <input type="text" id="emailInput" placeholder="janez.novak@gmail.com">
         </div>
-        <div class="btn-container">
+        <div class="edit-remove-contact btn-container">
             <button onclick="addAddress()">Add</button>
         </div>
     </div>
 </div>
 
-<!-- Modal for Editing Contact -->
-<div id="edit-contact-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeEditModal()">&times;</span>
+<!-- Form for Editing Contact -->
+<div id="edit-contact-form" class="form">
+    <div class="form-content">
+        <span class="close" onclick="closeEditForm()">&times;</span>
         <h2>Edit Contact</h2>
         <div class="input-container">
             <label for="editNameInput">Name:</label>
@@ -241,13 +337,31 @@
             <label for="editEmailInput">Email:</label>
             <input type="text" id="editEmailInput" placeholder="janez.novak@gmail.com">
         </div>
-        <div class="btn-container">
+        <div class="edit-remove-contact btn-container">
             <button onclick="updateContact()">Confirm</button>
         </div>
     </div>
 </div>
 
 <script>
+
+window.addEventListener('resize', function() {
+    const createContactBtn = document.getElementById('create-contact-btn');
+    if (window.innerWidth <= 992) {
+        createContactBtn.textContent = '+';
+        document.getElementById('search-bar').style.transition = "none";
+        document.getElementById('search-bar').style.width = "100%";
+    } else {
+        createContactBtn.textContent = 'Add Contact';
+        document.getElementById('search-bar').style.transition = "none";
+        document.getElementById('search-bar').style.width = "calc(100% - 80px)";
+    }
+    setTimeout(function() {
+    document.getElementById('search-bar').style.transition = 'width 0.1s ease';
+    }, 10);
+});
+window.dispatchEvent(new Event('resize'));
+
     let addresses = [];
     let originalAddresses = [];
 
@@ -256,7 +370,8 @@
         const cancelBtn = document.getElementById('cancel-search-btn');
         cancelBtn.addEventListener('click', function() {
             cancelBtn.style.display = 'none';
-            document.getElementById('search-bar').style.width = "100%";
+            if (window.innerWidth >= 993) document.getElementById('search-bar').style.width = "calc(100% - 80px)";
+            else document.getElementById('search-bar').style.width = "100%";
         });
 
         if (localStorage.getItem('addresses')) {
@@ -273,24 +388,20 @@
         searchInput.placeholder = `Search ${addresses.length} contacts`;
     }
 
-    function displayAddresses() {
+function displayAddresses() {
     // Clear previous content
     document.getElementById('contact-container').innerHTML = '';
-
-    // Sort addresses alphabetically
+    document.getElementById('right-container').innerHTML = '';
+    // Sort
     addresses.sort((a, b) => a.name.localeCompare(b.name));
-
     let currentLetter = null;
     let letterBlock = null;
 
     addresses.forEach((address, index) => {
         const firstLetter = address.name.charAt(0).toUpperCase();
-
         if (firstLetter !== currentLetter) {
-            // Create a new letter block
             currentLetter = firstLetter;
             letterBlock = document.createElement('div');
-            letterBlock.className = 'letter-block';
             letterBlock.innerHTML = `<div class="letter">${currentLetter}</div>`;
             document.getElementById('contact-container').appendChild(letterBlock);
         }
@@ -314,38 +425,76 @@
             <p><strong>Phone:</strong> ${address.phone}</p>
             ${emailContent}
             <div class="edit-remove-contact">
-                <button onclick="editContact(${addresses.indexOf(address)})">Edit Contact</button>
-                <button onclick="removeContact(${addresses.indexOf(address)})">Remove Contact</button>
+                <button onclick="editContact(${addresses.indexOf(address)})">Edit</button>
+                <button onclick="removeContact(${addresses.indexOf(address)})">Remove</button>
             </div>
         `;
         contactItem.appendChild(detailsContainer);
 
         contactItem.onclick = function() {
-            toggleDetails(detailsContainer);
+            const isSelected = contactItem.classList.contains('selected-contact');
+            const allContactItems = document.querySelectorAll('.contact-item');
+            allContactItems.forEach(item => item.classList.remove('selected-contact'));
+            if (window.innerWidth <= 992) {
+                    toggleDetails(detailsContainer);
+                }
+            if (!isSelected) {
+                contactItem.classList.add('selected-contact');
+                if (window.innerWidth >= 993) {
+                    displayContactDetails(address);
+                }
+            } else {
+                document.getElementById('right-container').innerHTML = '';
+            }
         };
+        document.getElementById('contact-container').appendChild(contactItem);
     });
+}
+
+
+function displayContactDetails(contact) {
+    let detailsContainer = `<h2>${contact.name}</h2>`;
+    
+    // Add phone information
+    detailsContainer += `<p><strong>Phone:</strong> ${contact.phone}</p>`;
+    
+    // Add email information if it exists
+    if (contact.email && contact.email.trim() !== '') {
+        detailsContainer += `<p><strong>Email:</strong> ${contact.email}</p>`;
+    }
+
+    // Add edit and remove buttons
+    detailsContainer += `
+        <div class="edit-remove-contact">
+            <button onclick="editContact(${addresses.indexOf(contact)})">Edit</button>
+            <button onclick="removeContact(${addresses.indexOf(contact)})">Remove</button>
+        </div>
+    `;
+    
+    // Update the content of the right container with the contact details
+    document.getElementById('right-container').innerHTML = detailsContainer;
 }
 
 
     let selectedContactIndex; // Add this line at the top of your JavaScript code
 
-// Modify the editContact function to store the index of the selected contact
-function editContact(index) {
-    selectedContactIndex = index;
-    const contact = addresses[index];
-    document.getElementById('editNameInput').value = contact.name;
-    document.getElementById('editPhoneInput').value = contact.phone;
-    document.getElementById('editEmailInput').value = contact.email;
-    document.getElementById('edit-contact-modal').style.display = 'block';
-}
+    // Modify the editContact function to store the index of the selected contact
+    function editContact(index) {
+        selectedContactIndex = index;
+        const contact = addresses[index];
+        document.getElementById('editNameInput').value = contact.name;
+        document.getElementById('editPhoneInput').value = contact.phone;
+        document.getElementById('editEmailInput').value = contact.email;
+        document.getElementById('edit-contact-form').style.display = 'block';
+    }
 
-    // Function to close the edit modal
-    function closeEditModal() {
-        document.getElementById('edit-contact-modal').style.display = 'none';
+    // Function to close the edit form
+    function closeEditForm() {
+        document.getElementById('edit-contact-form').style.display = 'none';
         clearEditInputFields();
     }
 
-    // Function to clear input fields in the edit modal
+    // Function to clear input fields in the edit form
     function clearEditInputFields() {
         document.getElementById('editNameInput').value = '';
         document.getElementById('editPhoneInput').value = '';
@@ -358,14 +507,14 @@ function editContact(index) {
         const phone = document.getElementById('editPhoneInput').value;
         const email = document.getElementById('editEmailInput').value;
 
-        if (name && phone && email) {
+        if (name && phone) {
             if (phone.startsWith('0')) {
                 document.getElementById('editPhoneError').style.display = 'none';
                 const updatedAddress = { name, phone, email };
                 addresses[selectedContactIndex] = updatedAddress;
                 saveAddressesToLocalStorage();
                 displayAddresses();
-                closeEditModal();
+                closeEditForm();
             } else {
                 document.getElementById('editPhoneError').style.display = 'block';
             }
@@ -374,13 +523,13 @@ function editContact(index) {
         }
     }
 
-    function openModal() {
-        document.getElementById('create-contact-modal').style.display = 'block';
+    function openForm() {
+        document.getElementById('create-contact-form').style.display = 'block';
     }
 
-    function closeModal() {
-        document.getElementById('create-contact-modal').style.display = 'none';
-        clearInputFields(); // Clear input fields when closing the modal
+    function closeForm() {
+        document.getElementById('create-contact-form').style.display = 'none';
+        clearInputFields(); // Clear input fields when closing the form
     }
 
     function clearInputFields() {
@@ -405,7 +554,7 @@ function editContact(index) {
                 addresses.push(newAddress);
                 saveAddressesToLocalStorage();
                 displayAddresses();
-                closeModal();
+                closeForm();
             } else {
                 document.getElementById('phoneError').style.display = 'block';
             }
@@ -450,110 +599,108 @@ function editContact(index) {
 
 
     function searchContacts() {
-    const searchValue = document.getElementById('search-bar').value.toLowerCase();
-    const cancelBtn = document.getElementById('cancel-search-btn');
+        const searchValue = document.getElementById('search-bar').value.toLowerCase();
+        const cancelBtn = document.getElementById('cancel-search-btn');
 
-    // Show or hide cancel button based on search input
-    if (searchValue.trim() !== '') {
-        cancelBtn.style.display = 'block';
-        document.getElementById('search-bar').style.width = "240px"; // Change width to 200px
-    } else {
-        cancelBtn.style.display = 'none';
-        document.getElementById('search-bar').style.width = "100%";
-        cancelSearch();
-        return;
-    }
+        // Show or hide cancel button based on search input
+        if (searchValue.trim() !== '') {
+            cancelBtn.style.display = 'block';
+            //desktop
+            if (window.innerWidth >= 993) document.getElementById('search-bar').style.width = "calc(100% - 140px)";
+            //mobile
+            else document.getElementById('search-bar').style.width = "calc(100% - 60px)";
+        } else {
+            cancelBtn.style.display = 'none';
+            //desktop
+            if (window.innerWidth >= 993) document.getElementById('search-bar').style.width = "calc(100% - 80px)";
+            else document.getElementById('search-bar').style.width = "100%";
+            cancelSearch();
+            return;
+        }
 
-    const matchingAddresses = addresses.filter(address => 
-        address.name.toLowerCase().includes(searchValue) ||
-        address.phone.toLowerCase().includes(searchValue) ||
-        address.email.toLowerCase().includes(searchValue)
-    );
+        const matchingAddresses = addresses.filter(address => 
+            address.name.toLowerCase().includes(searchValue) ||
+            address.phone.toLowerCase().includes(searchValue) ||
+            address.email.toLowerCase().includes(searchValue)
+        );
 
-    // Clear previous content
-    document.getElementById('contact-container').innerHTML = '';
+        // Clear previous content
+        document.getElementById('contact-container').innerHTML = '';
 
-    if (matchingAddresses.length > 0) {
-        matchingAddresses.forEach(address => {
-            const contactItem = document.createElement('div');
-            contactItem.className = 'contact-item';
-            contactItem.textContent = address.name;
-            document.getElementById('contact-container').appendChild(contactItem);
+        if (matchingAddresses.length > 0) {
+            matchingAddresses.forEach(address => {
+                const contactItem = document.createElement('div');
+                contactItem.className = 'contact-item';
+                contactItem.textContent = address.name;
+                document.getElementById('contact-container').appendChild(contactItem);
 
-            const detailsContainer = document.createElement('div');
-            detailsContainer.className = 'contact-details';
-            detailsContainer.id = `details-${addresses.indexOf(address)}`;
-            detailsContainer.innerHTML = `
-                <p><strong>Phone:</strong> ${address.phone}</p>
-                <p><strong>Email:</strong> ${address.email}</p>
-                <div class="remove-contact">
-                    <button onclick="removeContact(${addresses.indexOf(address)})">Remove Contact</button>
-                </div>
-            `;
-            contactItem.appendChild(detailsContainer);
-            let phoneHighlight;
-            let emailHighlight;
+                const detailsContainer = document.createElement('div');
+                detailsContainer.className = 'contact-details';
+                detailsContainer.id = `details-${addresses.indexOf(address)}`;
+                detailsContainer.innerHTML = `
+                    <p><strong>Phone:</strong> ${address.phone}</p>
+                    <p><strong>Email:</strong> ${address.email}</p>
+                    <div class="remove-contact">
+                        <button onclick="editContact(${addresses.indexOf(address)})">Edit</button>
+                        <button onclick="removeContact(${addresses.indexOf(address)})">Remove</button>
+                    </div>
+                `;
+                contactItem.appendChild(detailsContainer);
+                let phoneHighlight;
+                let emailHighlight;
 
-            // Highlight matching parts in the phone number
-            if (searchValue && address.phone.toLowerCase().includes(searchValue)) {
-                const phoneParts = address.phone.split(searchValue);
-                const formattedPhone = phoneParts.join(`<strong>${searchValue}</strong>`);
-                phoneHighlight = document.createElement('div');
-                phoneHighlight.innerHTML = formattedPhone;
-                phoneHighlight.style.fontWeight = 'normal';
-                phoneHighlight.style.fontSize = '14px';
-                contactItem.appendChild(phoneHighlight);
-            }
-
-            // Highlight matching parts in the email address
-            if (searchValue && address.email.toLowerCase().includes(searchValue)) {
-                const emailParts = address.email.split(searchValue);
-                const formattedEmail = emailParts.join(`<strong>${searchValue}</strong>`);
-                emailHighlight = document.createElement('div');
-                emailHighlight.innerHTML = formattedEmail;
-                emailHighlight.style.fontWeight = 'normal';
-                emailHighlight.style.fontSize = '14px';
-                contactItem.appendChild(emailHighlight);
-            }
-
-            contactItem.onclick = function() {
-                if (detailsContainer.style.display === 'block') {
-                    // If details are visible, hide them and show phone/email highlights
-                    toggleDetails(detailsContainer);
-                    if (phoneHighlight) phoneHighlight.style.display = 'block';
-                    if (emailHighlight) emailHighlight.style.display = 'block';
-                } else {
-                    // If details are hidden, show them and hide phone/email highlights
-                    toggleDetails(detailsContainer);
-                    if (phoneHighlight) phoneHighlight.style.display = 'none';
-                    if (emailHighlight) emailHighlight.style.display = 'none';
+                // Highlight matching parts in the phone number
+                if (searchValue && address.phone.toLowerCase().includes(searchValue)) {
+                    const phoneParts = address.phone.split(searchValue);
+                    const formattedPhone = phoneParts.join(`<strong>${searchValue}</strong>`);
+                    phoneHighlight = document.createElement('div');
+                    phoneHighlight.innerHTML = formattedPhone;
+                    phoneHighlight.style.fontWeight = 'normal';
+                    phoneHighlight.style.fontSize = '14px';
+                    contactItem.appendChild(phoneHighlight);
                 }
-            };
-        });
-    } else {
-        document.getElementById('contact-container').innerHTML = '<p>No matching contacts found.</p>';
+
+                // Highlight matching parts in the email address
+                if (searchValue && address.email.toLowerCase().includes(searchValue)) {
+                    const emailParts = address.email.split(searchValue);
+                    const formattedEmail = emailParts.join(`<strong>${searchValue}</strong>`);
+                    emailHighlight = document.createElement('div');
+                    emailHighlight.innerHTML = formattedEmail;
+                    emailHighlight.style.fontWeight = 'normal';
+                    emailHighlight.style.fontSize = '14px';
+                    contactItem.appendChild(emailHighlight);
+                }
+
+                contactItem.onclick = function() {
+                    if (detailsContainer.style.display === 'block') {
+                        // If details are visible, hide them and show phone/email highlights
+                        toggleDetails(detailsContainer);
+                        if (phoneHighlight) phoneHighlight.style.display = 'block';
+                        if (emailHighlight) emailHighlight.style.display = 'block';
+                    } else {
+                        // If details are hidden, show them and hide phone/email highlights
+                        toggleDetails(detailsContainer);
+                        if (phoneHighlight) phoneHighlight.style.display = 'none';
+                        if (emailHighlight) emailHighlight.style.display = 'none';
+                    }
+                };
+            });
+        } else {
+            document.getElementById('contact-container').innerHTML = '<p>No matching contacts found.</p>';
+        }
     }
-}
 
-
-function toggleDetails(detailsContainer) {
-    if (detailsContainer.parentElement.classList.contains('open')) {
-        // If details are already visible, hide them
-        detailsContainer.parentElement.classList.remove('open');
-    } else {
-        // Show details
-        detailsContainer.parentElement.classList.add('open');
+    function toggleDetails(detailsContainer) {
+        // if details are already visible, hide them else show details
+        if (detailsContainer.parentElement.classList.contains('open')) detailsContainer.parentElement.classList.remove('open');
+        else detailsContainer.parentElement.classList.add('open');
     }
-}
-
-
     function removeContact(index) {
         addresses.splice(index, 1);
         localStorage.setItem('addresses', JSON.stringify(addresses));
         displayAddresses();
         updateSearchPlaceholder();
     }
-
     function cancelSearch() {
         document.getElementById('search-bar').value = '';
         displayAddresses();
