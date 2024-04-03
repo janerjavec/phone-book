@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', function() {
         const createContactBtn = document.getElementById('create-contact-btn');
+        const sourcesBtn = document.getElementById('sources-link');
         if (window.innerWidth <= 992) {
             createContactBtn.textContent = '+';
+            sourcesBtn.textContent = 'ⓘ';
             document.getElementById('search-bar').style.transition = "none";
             document.getElementById('search-bar').style.width = "100%";
         } else {
             createContactBtn.textContent = 'Add Contact';
+            sourcesBtn.textContent = 'Sources';
             document.getElementById('search-bar').style.transition = "none";
             document.getElementById('search-bar').style.width = "calc(100% - 80px)";
         }
