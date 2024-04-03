@@ -147,6 +147,9 @@
 
 /* Mobile view */
 @media only screen and (max-width: 992px) {
+    #sources-link {
+        display:none;
+    }
     #right-container {
         display: none;
     }
@@ -240,6 +243,21 @@
         border: 1px solid #ccc;
         border-radius: 7px;
         box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        color:black;
+        font-size:14px;
+    }
+    #sources-link {
+        padding:7px;
+        padding-inline:10px;
+        background-color: white;
+        border: none;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 7px;
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        color:black;
+        font-size:14px;
+        text-decoration:none;
     }
     .contact-item {
         width: calc(100% - 72px);
