@@ -276,16 +276,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 contactItem.onclick = function() {
-                    if (details.style.display === 'block') {
-                        // if details visible, hide them and show phone,email
-                        toggleDetails(details);
-                        if (phoneHighlight) phoneHighlight.style.display = 'block';
-                        if (emailHighlight) emailHighlight.style.display = 'block';
-                    } else {
-                        // if details hidden, show them and hide phone,email
-                        toggleDetails(details);
-                        if (phoneHighlight) phoneHighlight.style.display = 'none';
-                        if (emailHighlight) emailHighlight.style.display = 'none';
+                    if (window.innerWidth >= 993) {
+                        document.getElementById('right-container').innerHTML = '';
+                        displayContactDetails(address);
+                    }
+                    else{
+                        if (details.style.display === 'block') {
+                            // if details visible, hide them and show phone,email
+                            toggleDetails(details);
+                            if (phoneHighlight) phoneHighlight.style.display = 'block';
+                            if (emailHighlight) emailHighlight.style.display = 'block';
+                        } else {
+                            // if details hidden, show them and hide phone,email
+                            toggleDetails(details);
+                            if (phoneHighlight) phoneHighlight.style.display = 'none';
+                            if (emailHighlight) emailHighlight.style.display = 'none';
+                        }
                     }
                 };
             });
