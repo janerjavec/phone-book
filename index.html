@@ -43,12 +43,12 @@
             <div class="input-container">
                 <label for="phoneInput">Phone:</label>
                 <input type="text" id="phoneInput" oninput="formatPhoneNumber(this)" placeholder="012 345 678">
-
                 <span id="phoneError" class="error-message"></span>
             </div>
             <div class="input-container">
                 <label for="emailInput">Email:</label>
                 <input type="text" id="emailInput" placeholder="janez.novak@gmail.com">
+                <span id="emailError" class="error-message"></span>
             </div>
             <div class="edit-remove-contact btn-container">
                 <button onclick="addAddress()">Add</button>
@@ -72,6 +72,7 @@
             <div class="input-container">
                 <label for="editEmailInput">Email:</label>
                 <input type="text" id="editEmailInput" placeholder="janez.novak@gmail.com">
+                <span id="editEmailError" class="error-message"></span>
             </div>
             <div class="edit-remove-contact btn-container">
                 <button onclick="updateContact()">Confirm</button>
