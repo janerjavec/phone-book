@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sources</title>
 <style>
-/* CSS stilizacija, lahko se prilagodi */
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
@@ -22,14 +21,20 @@ ul {
     padding: 0;
 }
 li {
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 a {
-    color: #007bff;
+    color: blue;
     text-decoration: none;
 }
 a:hover {
     text-decoration: underline;
+}
+.code {
+    background-color: #f3f3f3;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 7px;
 }
 </style>
 </head>
@@ -63,10 +68,10 @@ a:hover {
             </li>
             <li>
                 <a href="https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript">Stackoverflow - How to validate an email address in Javascript</a>
-                - Email regex (const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;)
+                - Email regex:
+                <br><br><code class="code">const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;</code>
+                <br><br>Uporabljeno za preverjanje pravilnega Email formata.
             </li>
-            
-            
         </ul>
     </div>
 </body>
